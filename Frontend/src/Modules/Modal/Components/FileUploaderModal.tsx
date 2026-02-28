@@ -7,8 +7,6 @@ import { Button } from "@/Modules/Common";
 import useI18n from "@/hooks/useI18n";
 import Title from "@/Modules/Common/Components/Title";
 
-type UploadStatus = "idle" | "uploading" | "success" | "error";
-
 interface FileUploaderProps {
   onClose: () => void;
 }

@@ -4,6 +4,10 @@ function success(message: string) {
   toast.success(message);
 }
 
+function info(message: string) {
+  toast.info(message);
+}
+
 // TODO: define custom style for toasts
 function error(message: string, infinite?: boolean) {
   toast.error(message, {
@@ -14,5 +18,6 @@ function error(message: string, infinite?: boolean) {
 
 export const toastMsg = {
   success,
+  info,
   error,
 };

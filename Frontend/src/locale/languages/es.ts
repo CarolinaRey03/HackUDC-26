@@ -18,4 +18,9 @@ export const es: I18nTemplate = {
     upload: "Subir",
     uploadTitle: "Sube un documento",
   },
+  uploadFile: {
+    info: "Subiendo documento...",
+    success: "El documento se subió con éxito",
+    error: "Error al subir el documento",
+  },
 };

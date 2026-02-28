@@ -4,6 +4,11 @@ export interface I18nTemplate {
     uploadTitle: string;
     upload: string;
   };
+  uploadFile: {
+    info: string;
+    success: string;
+    error: string;
+  };
   searchbar: {
     placeholder: {
       file_name: string;

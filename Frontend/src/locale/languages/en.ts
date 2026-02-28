@@ -18,4 +18,9 @@ export const en: I18nTemplate = {
     upload: "Upload",
     uploadTitle: "Upload a document",
   },
+  uploadFile: {
+    info: "Uploading document...",
+    success: "El documetno",
+    error: "",
+  },
 };

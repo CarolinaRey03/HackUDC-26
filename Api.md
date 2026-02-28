@@ -48,7 +48,10 @@ Payload
 ```json
 {
   "query": "string",
-  "limit": "number"
+  "limit": "number",
+  "language": "string",
+  "type": "string",
+  "date": "number" // epoch
 }
 ```
 
