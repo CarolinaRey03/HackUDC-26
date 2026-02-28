@@ -17,14 +17,29 @@ def _get_es_client() -> Elasticsearch:
     return _client
 
 
+def analyze_text_es(text: str) -> str:
+    """Returns the text after applying stopword removal (Spanish)."""
+    client = _get_es_client()
+    response = client.indices.analyze(
+        body={
+            "tokenizer": "standard",
+            "filter": [{"type": "stop", "stopwords": "_spanish_"}],
+            "text": text,
+        },
+    )
+    return " ".join(token["token"] for token in response["tokens"])
+
+
 def index_document_es(
     file_id: str,
     filename: str,
     content_type: str,
+    language: str,
+    chunks: list[str],
     embeddings: list[list[float]],
 ) -> None:
     client = _get_es_client()
-    for i, embedding in enumerate(embeddings):
+    for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
         client.index(
             index=settings.elasticsearch_index,
             document={
@@ -32,6 +47,8 @@ def index_document_es(
                 "filename": filename,
                 "file_type": splitext(filename)[1],
                 "content_type": content_type,
+                "language": language,
+                "content": chunk,
                 "chunk_index": i,
                 "embedding": embedding,
             },

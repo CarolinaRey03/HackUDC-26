@@ -4,11 +4,14 @@ import uuid
 
 from fastapi import HTTPException, UploadFile, status
 
+from langdetect import detect
+
 from PyPDF2 import PdfReader
 from sentence_transformers import SentenceTransformer
 from app.config import settings
 from app.core.logging import setup_logger
 from app.repositories.documents_repo import (
+    analyze_text_es,
     delete_document_es,
     get_document_metadata_es,
     index_document_es,
@@ -38,12 +41,14 @@ async def index_document(file: UploadFile) -> None:
     content_type = file.content_type or ""
 
     text = _extract_text(content, content_type, filename)
+    language = detect(text)
     chunks = _chunk_text(text)
     _logger.debug(
         "Chunks: %d — preview:\n%s", len(chunks), "\n".join(text.splitlines()[:6])
     )
 
-    embeddings = _get_model().encode(chunks).tolist()
+    analyzed_chunks = [analyze_text_es(chunk) for chunk in chunks]
+    embeddings = _get_model().encode(analyzed_chunks).tolist()
 
     file_id = str(uuid.uuid4())
     os.makedirs(settings.files_dir, exist_ok=True)
@@ -55,6 +60,8 @@ async def index_document(file: UploadFile) -> None:
         file_id=file_id,
         filename=filename,
         content_type=content_type,
+        language=language,
+        chunks=analyzed_chunks,
         embeddings=embeddings,
     )
 

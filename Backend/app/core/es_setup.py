@@ -11,6 +11,13 @@ def init_index(client: Elasticsearch) -> None:
     client.indices.create(
         index=index,
         body={
+            "settings": {
+                "analysis": {
+                    "analyzer": {
+                        "doc_analyzer": {"type": "stop", "stopwords": "_spanish_"}
+                    }
+                }
+            },
             "mappings": {
                 "properties": {
                     "file_id": {"type": "keyword"},
@@ -23,6 +30,6 @@ def init_index(client: Elasticsearch) -> None:
                         "similarity": "cosine",
                     },
                 }
-            }
+            },
         },
     )
