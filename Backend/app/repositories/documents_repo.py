@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import splitext
 from elasticsearch import Elasticsearch, NotFoundError
 
 from app.config import settings
@@ -20,7 +21,6 @@ def index_document_es(
     file_id: str,
     filename: str,
     content_type: str,
-    chunks: list[str],
     embeddings: list[list[float]],
 ) -> None:
     client = _get_es_client()
@@ -30,6 +30,7 @@ def index_document_es(
             document={
                 "file_id": file_id,
                 "filename": filename,
+                "file_type": splitext(filename)[1],
                 "content_type": content_type,
                 "chunk_index": i,
                 "embedding": embedding,

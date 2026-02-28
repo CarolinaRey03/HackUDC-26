@@ -32,22 +32,6 @@ def _get_model() -> SentenceTransformer:
     return _model
 
 
-def _chunk_text(text: str, max_chars: int = 500) -> list[str]:
-    paragraphs = [p.strip() for p in text.splitlines() if p.strip()]
-    chunks: list[str] = []
-    current = ""
-    for p in paragraphs:
-        if len(current) + len(p) + 1 <= max_chars:
-            current = (current + "\n" + p).strip()
-        else:
-            if current:
-                chunks.append(current)
-            current = p
-    if current:
-        chunks.append(current)
-    return chunks
-
-
 async def index_document(file: UploadFile) -> None:
     content = await file.read()
     filename = file.filename or ""
@@ -71,9 +55,24 @@ async def index_document(file: UploadFile) -> None:
         file_id=file_id,
         filename=filename,
         content_type=content_type,
-        chunks=chunks,
         embeddings=embeddings,
     )
+
+
+def _chunk_text(text: str, max_chars: int = 500) -> list[str]:
+    paragraphs = [p.strip() for p in text.splitlines() if p.strip()]
+    chunks: list[str] = []
+    current = ""
+    for p in paragraphs:
+        if len(current) + len(p) + 1 <= max_chars:
+            current = (current + "\n" + p).strip()
+        else:
+            if current:
+                chunks.append(current)
+            current = p
+    if current:
+        chunks.append(current)
+    return chunks
 
 
 def list_documents(limit: int) -> list[DocumentInfo]:
@@ -90,6 +89,7 @@ def delete_document(file_id: str) -> None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
         )
+
     file_path = os.path.join(settings.files_dir, file_id)
     if os.path.exists(file_path):
         os.remove(file_path)
@@ -97,7 +97,7 @@ def delete_document(file_id: str) -> None:
 
 def get_document(file_id: str) -> tuple[str, str, str]:
     """Returns (file_path, filename, content_type)."""
-    meta = get_document_meta_es(file_id)
+    meta = get_document_metadata_es(file_id)
     if meta is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
