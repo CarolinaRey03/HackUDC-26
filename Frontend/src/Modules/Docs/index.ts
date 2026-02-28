@@ -1,1 +1,1 @@
-export { default as Docs } from "./Components/Docs";
+export { default as Docs } from "./Components/DocsList";

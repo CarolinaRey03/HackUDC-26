@@ -2,6 +2,7 @@ import { getAllDocs, type DocInfo } from "@/api";
 import { RESULTS_LIMIT } from "@/utls/constants";
 import { toastMsg } from "@/utls/toastMsg";
 import { useEffect, useState } from "react";
+import Doc from "./Doc";
 
 function Docs() {
   const [docs, setDocs] = useState<DocInfo[]>([]);
@@ -13,10 +14,12 @@ function Docs() {
   }, []);
 
   return (
-    <div>
-      {docs.map((doc) => (
-        <div>{doc.name}</div>
-      ))}
+    <div className="docs">
+      <ul className="docs__list">
+        {docs.map((doc) => (
+          <Doc key={doc.id} doc={doc} />
+        ))}
+      </ul>
     </div>
   );
 }

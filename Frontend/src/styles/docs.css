@@ -1,0 +1,49 @@
+.docs {
+  width: 100%;
+}
+
+.docs__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.docs__doc-item {
+  text-align: left;
+  font-size: large;
+}
+
+.docs__doc-item-btn {
+  width: 100%;
+  display: flex;
+
+  padding-bottom: 5px;
+  padding-top: 5px;
+
+  align-items: center;
+  gap: 6px;
+
+  background: none;
+  color: var(--color-text);
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: left;
+
+  &:hover {
+    background-color: var(--color-bg);
+  }
+
+  & svg {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.docs__doc-item-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
