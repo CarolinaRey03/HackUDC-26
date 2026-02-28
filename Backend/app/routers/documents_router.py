@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from app.core.logging import setup_logger
 from app.schemas.documents_schemas import DocumentInfo
 from app.services.documents_service import (
+    delete_document,
     get_document,
     index_document,
     list_documents,
@@ -40,6 +41,17 @@ def get_filtered_documents(query: str, limit: int = 5):
         return search_documents(query, limit)
     except Exception as e:
         _logger.exception("GET /docs/filtered failed: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_document_by_id(id: str):
+    try:
+        delete_document(id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        _logger.exception("DELETE /docs/%s failed: %s", id, e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

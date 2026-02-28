@@ -1,3 +1,4 @@
+from typing import Optional
 from elasticsearch import Elasticsearch, NotFoundError
 
 from app.config import settings
@@ -45,9 +46,7 @@ def list_documents_es(limit: int = 100) -> list[dict]:
             "aggs": {
                 "files": {
                     "terms": {"field": "file_id", "size": limit},
-                    "aggs": {
-                        "name": {"terms": {"field": "filename", "size": 1}}
-                    },
+                    "aggs": {"name": {"terms": {"field": "filename", "size": 1}}},
                 }
             },
         },
@@ -87,7 +86,17 @@ def search_documents_es(embedding: list[float], limit: int = 5) -> list[dict]:
     return results
 
 
-def get_document_meta_es(file_id: str) -> dict | None:
+def delete_document_es(file_id: str) -> bool:
+    """Returns False if no documents were found for this file_id."""
+    client = _get_es_client()
+    response = client.delete_by_query(
+        index=settings.elasticsearch_index,
+        body={"query": {"term": {"file_id": file_id}}},
+    )
+    return response["deleted"] > 0
+
+
+def get_document_metadata_es(file_id: str) -> Optional[dict]:
     client = _get_es_client()
     try:
         response = client.search(

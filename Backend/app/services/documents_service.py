@@ -9,7 +9,8 @@ from sentence_transformers import SentenceTransformer
 from app.config import settings
 from app.core.logging import setup_logger
 from app.repositories.documents_repo import (
-    get_document_meta_es,
+    delete_document_es,
+    get_document_metadata_es,
     index_document_es,
     list_documents_es,
     search_documents_es,
@@ -54,7 +55,9 @@ async def index_document(file: UploadFile) -> None:
 
     text = _extract_text(content, content_type, filename)
     chunks = _chunk_text(text)
-    _logger.debug("Chunks: %d — preview:\n%s", len(chunks), "\n".join(text.splitlines()[:6]))
+    _logger.debug(
+        "Chunks: %d — preview:\n%s", len(chunks), "\n".join(text.splitlines()[:6])
+    )
 
     embeddings = _get_model().encode(chunks).tolist()
 
@@ -82,15 +85,29 @@ def search_documents(query: str, limit: int) -> list[DocumentInfo]:
     return [DocumentInfo(**doc) for doc in search_documents_es(embedding, limit)]
 
 
+def delete_document(file_id: str) -> None:
+    if not delete_document_es(file_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
+    file_path = os.path.join(settings.files_dir, file_id)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+
 def get_document(file_id: str) -> tuple[str, str, str]:
     """Returns (file_path, filename, content_type)."""
     meta = get_document_meta_es(file_id)
     if meta is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
 
     file_path = os.path.join(settings.files_dir, file_id)
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found on disk")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="File not found on disk"
+        )
 
     return file_path, meta["filename"], meta["content_type"]
 
