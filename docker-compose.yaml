@@ -5,10 +5,66 @@ services:
       - "8000:80"
     volumes:
       - ./Backend/app:/code/app
+    env_file:
+      - .env
     networks:
       - project_net
     restart: unless-stopped
-  
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    image: elasticsearch:8.17.0
+    hostname: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - project_net
+    restart: unless-stopped
+
+  setup:
+    image: elasticsearch:8.17.0
+    env_file:
+      - .env
+    command: >
+      bash -c '
+        until curl -s -u elastic:$$ELASTICSEARCH_PASSWORD http://elasticsearch:9200/_cluster/health | grep -q "status"; do
+          echo "Waiting for Elasticsearch..."; sleep 5;
+        done;
+        curl -s -u elastic:$$ELASTICSEARCH_PASSWORD -X POST http://elasticsearch:9200/_security/user/kibana_system/_password -H "Content-Type: application/json" -d "{\"password\":\"$$KIBANA_PASSWORD\"}";
+        echo "Setup complete."
+      '
+    networks:
+      - project_net
+    depends_on:
+      - elasticsearch
+    restart: on-failure
+
+  kibana:
+    image: kibana:8.17.0
+    hostname: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+    ports:
+      - "5601:5601"
+    networks:
+      - project_net
+    restart: unless-stopped
+    depends_on:
+      - setup
+
 networks:
   project_net:
+
+volumes:
+  es_data:
 
