@@ -11,18 +11,12 @@ def init_index(client: Elasticsearch) -> None:
     client.indices.create(
         index=index,
         body={
-            "settings": {
-                "analysis": {
-                    "analyzer": {
-                        "doc_analyzer": {"type": "stop", "stopwords": "_spanish_"}
-                    }
-                }
-            },
             "mappings": {
                 "properties": {
                     "file_id": {"type": "keyword"},
                     "filename": {"type": "keyword"},
                     "chunk_index": {"type": "integer"},
+                    "content": {"type": "text"},
                     "embedding": {
                         "type": "dense_vector",
                         "dims": settings.embedding_dims,

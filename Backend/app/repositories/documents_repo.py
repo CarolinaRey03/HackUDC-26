@@ -21,11 +21,7 @@ def analyze_text_es(text: str) -> str:
     """Returns the text after applying stopword removal (Spanish)."""
     client = _get_es_client()
     response = client.indices.analyze(
-        body={
-            "tokenizer": "standard",
-            "filter": [{"type": "stop", "stopwords": "_spanish_"}],
-            "text": text,
-        },
+        body={"analyzer": "spanish", "text": text},
     )
     return " ".join(token["token"] for token in response["tokens"])
 
