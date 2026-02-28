@@ -3,12 +3,15 @@ import io
 from fastapi import HTTPException, UploadFile, status
 
 from PyPDF2 import PdfReader
+from app.core.logging import setup_logger
 from app.repositories.documents_repo import index_document_es
 from odf.opendocument import load
 
 from odf.text import P
 
 from docx import Document
+
+_logger = setup_logger(__name__)
 
 
 async def index_document(file: UploadFile) -> dict:
@@ -27,7 +30,9 @@ def _extract_text(content: bytes, content_type: str, filename: str) -> str:
 
     if ct == "application/pdf" and name.endswith(".pdf"):
         reader = PdfReader(io.BytesIO(content))
-        return "\n".join(page.extract_text() for page in reader.pages)
+        text = "\n".join(page.extract_text() for page in reader.pages)
+        _logger.debug("\n".join(text.splitlines()[:6]))
+        return text
 
     if (
         ct == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -38,7 +43,7 @@ def _extract_text(content: bytes, content_type: str, filename: str) -> str:
 
     if ct == "application/vnd.oasis.opendocument.text" and name.endswith(".odt"):
         odf_doc = load(io.BytesIO(content))
-        return "\n".join(str(p) for p in odf_doc.text.getElementsByType(P))
+        return "\n".join(str(p) for p in odf_doc.body.getElementsByType(P))
 
     if ct == "text/plain" and name.endswith(".txt"):
         return content.decode("utf-8", errors="replace")

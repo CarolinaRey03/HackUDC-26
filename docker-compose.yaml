@@ -5,6 +5,7 @@ services:
       - "8000:80"
     volumes:
       - ./Backend/app:/code/app
+      - ./Backend/logs:/code/logs
     env_file:
       - .env
     networks:
