@@ -20,7 +20,7 @@ export const en: I18nTemplate = {
   },
   uploadFile: {
     info: "Uploading document...",
-    success: "El documetno",
-    error: "",
+    success: "El documento se subió con éxito",
+    error: "Error al subir el documento",
   },
 };

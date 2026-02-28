@@ -6,6 +6,8 @@ import { splitFilename } from "@/utls/formatters";
 import { Button } from "@/Modules/Common";
 import useI18n from "@/hooks/useI18n";
 import Title from "@/Modules/Common/Components/Title";
+import { uploadDoc } from "@/api";
+import { toastMsg } from "@/utls/toastMsg";
 
 interface FileUploaderProps {
   onClose: () => void;
@@ -25,8 +27,13 @@ export default function FileUploaderModal({ onClose }: FileUploaderProps) {
   async function handleFileUpload() {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+    toastMsg.info(translate("uploadFile.info"));
+
+    uploadDoc(file)
+      .then(() => toastMsg.success(translate("uploadFile.success")))
+      .catch(() => toastMsg.error(translate("uploadFile.error")));
+
+    onClose();
   }
 
   return (
