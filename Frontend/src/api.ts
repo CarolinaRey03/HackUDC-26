@@ -83,17 +83,29 @@ export const getFilteredDocs = async (query: string, limit: number): Promise<Doc
  * GET /docs/{id}
  * Fetches the content of a specific doc.
  */
-export const getDocById = async (id: string): Promise<DocResponse> => {
+export const getDocById = async (id: string, fileNameFallback?: string): Promise<File> => {
   const response = await fetch(`${BASE_URL}/docs/${id}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
 
   if (!response.ok) {
     throw new Error(`Error fetching doc content: ${response.statusText}`);
   }
 
-  return response.json();
+  const blob = await response.blob();
+
+  // Try to extract filename from Content-Disposition header
+  const contentDisposition = response.headers.get("Content-Disposition");
+  let fileName = fileNameFallback || "document";
+  if (contentDisposition) {
+    const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+    if (fileNameMatch && fileNameMatch.length > 1) {
+      fileName = fileNameMatch[1];
+    }
+  }
+
+  // Ensure we use the blob's type or a fallback
+  const type = blob.type || "application/octet-stream";
+
+  return new File([blob], fileName, { type });
 };
