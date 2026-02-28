@@ -4,8 +4,10 @@ Pillar todos los ficheros
 
 Payload
 
-```
-none
+```json
+{
+  "limit": "number"
+}
 ```
 
 Response
@@ -45,7 +47,8 @@ Payload
 
 ```json
 {
-  "query": "string"
+  "query": "string",
+  "limit": "number"
 }
 ```
 
