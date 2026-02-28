@@ -5,6 +5,7 @@ interface DocxViewerProps {
   file: File;
 }
 
+// TODO: fix the preview size
 function DocxViewer({ file }: DocxViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
