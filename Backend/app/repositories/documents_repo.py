@@ -22,9 +22,10 @@ def index_document_es(
     filename: str,
     content_type: str,
     embeddings: list[list[float]],
+    chunks: list[str],
 ) -> None:
     client = _get_es_client()
-    for i, embedding in enumerate(embeddings):
+    for i, (embedding, chunk) in enumerate(zip(embeddings, chunks)):
         client.index(
             index=settings.elasticsearch_index,
             document={
@@ -34,6 +35,7 @@ def index_document_es(
                 "content_type": content_type,
                 "chunk_index": i,
                 "embedding": embedding,
+                "content": chunk,
             },
         )
 
@@ -72,7 +74,8 @@ def search_documents_es(embedding: list[float], limit: int = 5) -> list[dict]:
                 "k": limit * 3,
                 "num_candidates": limit * 30,
             },
-            "_source": ["file_id", "filename"],
+            # AÑADIDO: Pedimos a Elasticsearch que nos devuelva también el 'content'
+            "_source": ["file_id", "filename", "content"],
         },
     )
     seen: set[str] = set()
@@ -81,7 +84,12 @@ def search_documents_es(embedding: list[float], limit: int = 5) -> list[dict]:
         fid = hit["_source"]["file_id"]
         if fid not in seen:
             seen.add(fid)
-            results.append({"id": fid, "name": hit["_source"]["filename"]})
+            # AÑADIDO: Devolvemos el fragmento de texto que hizo match
+            results.append({
+                "id": fid, 
+                "name": hit["_source"]["filename"],
+                "match_text": hit["_source"].get("content", "")
+            })
         if len(results) >= limit:
             break
     return results
