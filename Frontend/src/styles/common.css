@@ -19,7 +19,14 @@
 }
 
 .button {
-  background-color: var(--color-bg-light);
+  background-color: var(--color-bg);
   padding: 1px;
-  border-radius: 1px;
+  border: none;
+  transition: background-color 200ms ease;
+
+  &:hover {
+    background-color: var(--color-bg-light);
+    outline: none;
+    border: none;
+  }
 }

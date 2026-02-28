@@ -1,0 +1,99 @@
+/**
+ * API service for document management.
+ * Adjust the BASE_URL to your backend's URL.
+ */
+
+// --- Backend Configuration ---
+export const BASE_URL = "http://localhost:8000";
+// -----------------------------
+
+export interface DocInfo {
+  id: string;
+  name: string;
+}
+
+export interface DocResponse {
+  doc: string; // The doc content, URL, or base64 representation
+}
+
+/**
+ * GET /docs/all
+ * Fetches all docs.
+ */
+export const getAllDocs = async (limit: number): Promise<DocInfo[]> => {
+  const url = new URL(`${BASE_URL}/docs/all`);
+  if (limit) url.searchParams.append("limit", limit.toString());
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching all docs: ${response.statusText}`);
+  }
+
+  return response.json();
+};
+
+/**
+ * POST /docs
+ * Uploads a doc.
+ */
+export const uploadDoc = async (doc: File): Promise<void> => {
+  const formData = new FormData();
+  formData.append("doc", doc);
+
+  const response = await fetch(`${BASE_URL}/docs`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error uploading doc: ${response.statusText}`);
+  }
+};
+
+/**
+ * GET /docs/filtered
+ * Filters docs with a query and limit.
+ */
+export const getFilteredDocs = async (query: string, limit?: number): Promise<DocInfo[]> => {
+  const url = new URL(`${BASE_URL}/docs/filtered`);
+  url.searchParams.append("query", query);
+  if (limit) url.searchParams.append("limit", limit.toString());
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error filtering docs: ${response.statusText}`);
+  }
+
+  return response.json();
+};
+
+/**
+ * GET /docs/{id}
+ * Fetches the content of a specific doc.
+ */
+export const getDocById = async (id: string): Promise<DocResponse> => {
+  const response = await fetch(`${BASE_URL}/docs/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching doc content: ${response.statusText}`);
+  }
+
+  return response.json();
+};
