@@ -22,11 +22,19 @@
   background-color: var(--color-bg);
   padding: 1px;
   border: none;
-  transition: background-color 200ms ease;
+  transition: background-color 100ms ease;
 
   &:hover {
     background-color: var(--color-bg-light);
+
     outline: none;
     border: none;
   }
+}
+
+.title {
+  color: var(--color-text);
+  text-align: left;
+  font-size: 25px;
+  margin-top: 0;
 }

@@ -60,7 +60,7 @@ export const uploadDoc = async (doc: File): Promise<void> => {
  * GET /docs/filtered
  * Filters docs with a query and limit.
  */
-export const getFilteredDocs = async (query: string, limit?: number): Promise<DocInfo[]> => {
+export const getFilteredDocs = async (query: string, limit: number): Promise<DocInfo[]> => {
   const url = new URL(`${BASE_URL}/docs/filtered`);
   url.searchParams.append("query", query);
   if (limit) url.searchParams.append("limit", limit.toString());
