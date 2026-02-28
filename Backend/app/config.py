@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     elasticsearch_index: str = "documents"
     elasticsearch_user: str
     elasticsearch_password: str
+    embedding_model: str = "all-MiniLM-L6-v2"
+    embedding_dims: int = 384
+    files_dir: str = "/code/files"
 
 
 settings = Settings()  # type: ignore[call-arg]

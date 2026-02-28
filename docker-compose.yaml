@@ -6,6 +6,7 @@ services:
     volumes:
       - ./Backend/app:/code/app
       - ./Backend/logs:/code/logs
+      - ./Backend/files:/code/files
     env_file:
       - .env
     networks:
