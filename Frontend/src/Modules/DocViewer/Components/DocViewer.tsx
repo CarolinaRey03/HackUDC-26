@@ -1,5 +1,4 @@
 import { splitFilename } from "@/utls/formatters";
-import "@react-pdf-viewer/core/lib/styles/index.css";
 import PdfViewer from "./PdfViewer";
 import TxtViewer from "./TxtViewer";
 import DocxViewer from "./DocxViewer";

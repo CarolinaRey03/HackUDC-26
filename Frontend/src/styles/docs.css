@@ -20,6 +20,9 @@
 .docs__doc-item {
   text-align: left;
   font-size: large;
+
+  display: flex;
+  align-items: center;
 }
 
 .docs__doc-item-btn {
@@ -68,4 +71,13 @@
   & svg {
     height: 100%;
   }
+}
+
+.docs__delete-btn {
+  box-sizing: border-box;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  background: none;
+  color: var(--color-error);
 }

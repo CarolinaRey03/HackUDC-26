@@ -115,3 +115,13 @@ export const getDocById = async (id: string, fileNameFallback?: string): Promise
 
   return new File([blob], fileName, { type });
 };
+
+export const deleteDoc = async (id: string): Promise<void> => {
+  const response = await fetch(`${BASE_URL}/docs/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error deleting doc: ${response.statusText}`);
+  }
+};

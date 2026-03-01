@@ -6,10 +6,8 @@ import { Docs } from "@/Modules/Docs";
 import { ToastProvider } from "@/Modules/ToastMsg";
 import { getScriptSplitSizes, setScriptSplitSizes } from "@/utls/localStorage";
 import { DeepSearch } from "@/Modules/DeepSearch";
-import { useDocs } from "@/Context/DocsContext";
 
 function Home() {
-  const { currentDoc } = useDocs();
   const getSizes = (): number[] => {
     return getScriptSplitSizes() ?? [50, 50];
   };
@@ -18,7 +16,7 @@ function Home() {
     <>
       <ToastProvider />
       <div className="home bg">
-        <Split className="split" sizes={getSizes()} onDragEnd={setScriptSplitSizes}>
+        <Split minSize={200} className="split" sizes={getSizes()} onDragEnd={setScriptSplitSizes}>
           <Panel>
             <Docs />
           </Panel>

@@ -24,6 +24,7 @@ export interface I18nTemplate {
       all_docs: string;
       filtered_docs: string;
     };
+    delete: string;
     open: {
       doc: string;
     };
@@ -37,6 +38,17 @@ export interface I18nTemplate {
       placeholder: string;
       en: string;
       es: string;
+    };
+    type: {
+      placeholder: string;
+      pdf: string;
+      docx: string;
+      odt: string;
+      csv: string;
+      txt: string;
+      xls: string;
+      ods: string;
+      xlsx: string;
     };
   };
 }

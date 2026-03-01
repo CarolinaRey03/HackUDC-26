@@ -13,6 +13,7 @@ export const en: I18nTemplate = {
     open: {
       doc: "An error ocurred while opening the document",
     },
+    delete: "An error ocurred while deleting the document",
   },
   searchbar: {
     placeholder: {
@@ -40,5 +41,16 @@ export const en: I18nTemplate = {
       es: "Spanish",
     },
     none: "None",
+    type: {
+      placeholder: "Type",
+      pdf: "PDF",
+      docx: "DOCX",
+      odt: "ODT",
+      csv: "CSV",
+      txt: "TXT",
+      xls: "XLS",
+      ods: "ODS",
+      xlsx: "XLSX",
+    },
   },
 };

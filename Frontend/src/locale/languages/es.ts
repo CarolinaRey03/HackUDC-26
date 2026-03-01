@@ -13,6 +13,7 @@ export const es: I18nTemplate = {
     open: {
       doc: "Se produjo un error al abrir el documento",
     },
+    delete: "Se produjo un error al borrar el documento",
   },
   searchbar: {
     placeholder: {
@@ -40,5 +41,16 @@ export const es: I18nTemplate = {
       es: "Castellano",
     },
     none: "Ninguno",
+    type: {
+      placeholder: "Tipo",
+      pdf: "PDF",
+      docx: "DOCX",
+      odt: "ODT",
+      csv: "CSV",
+      txt: "TXT",
+      xls: "XLS",
+      ods: "ODS",
+      xlsx: "XLSX",
+    },
   },
 };
