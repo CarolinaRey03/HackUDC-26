@@ -20,6 +20,7 @@ export interface I18nTemplate {
     };
   };
   error: {
+    unsupportedType: string;
     fetch: {
       all_docs: string;
       filtered_docs: string;

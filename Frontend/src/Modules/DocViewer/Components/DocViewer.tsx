@@ -4,32 +4,35 @@ import TxtViewer from "./TxtViewer";
 import DocxViewer from "./DocxViewer";
 import OdtViewer from "./OdtViewer";
 import CsvViewer from "./CsvViewer";
+import BodyText from "@/Modules/Common/Components/BodyText";
+import useI18n from "@/hooks/useI18n";
 
 interface DocViewerProps {
   file: File;
 }
 
-const decideViewer = (file: File, extension: string) => {
-  console.log({ extension });
-  switch (extension.toLocaleLowerCase()) {
-    case "pdf":
-      return <PdfViewer file={file} />;
-    case "txt":
-      return <TxtViewer file={file} />;
-    case "docx":
-      return <DocxViewer file={file} />;
-    case "odt":
-      return <OdtViewer file={file} />;
-    case "csv":
-      return <CsvViewer file={file} />;
-    // TODO: return something in case of error
-    default:
-      return null;
-  }
-};
-
 function DocViewer({ file }: DocViewerProps) {
+  const { translate } = useI18n();
+  console.log({ file });
   const { extension } = splitFilename(file.name);
+
+  const decideViewer = (file: File, extension: string) => {
+    console.log({ extension });
+    switch (extension.toLocaleLowerCase()) {
+      case "pdf":
+        return <PdfViewer file={file} />;
+      case "txt":
+        return <TxtViewer file={file} />;
+      case "docx":
+        return <DocxViewer file={file} />;
+      case "odt":
+        return <OdtViewer file={file} />;
+      case "csv":
+        return <CsvViewer file={file} />;
+      default:
+        return <BodyText>{translate("error.unsupportedType")}</BodyText>;
+    }
+  };
 
   return <div className="docviewer">{decideViewer(file, extension)}</div>;
 }

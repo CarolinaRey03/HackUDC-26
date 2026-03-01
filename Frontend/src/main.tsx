@@ -2,8 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { Home } from "./Modules/Home";
-import { IntlProvider } from "react-intl";
-import { messages } from "./locale/messages";
+import { LanguageProvider } from "@/Context/LanguageContext";
 import { DocsProvider } from "@/Context/DocsContext";
 
 // async function enableMocking() {
@@ -16,17 +15,14 @@ import { DocsProvider } from "@/Context/DocsContext";
 //   return worker.start();
 // }
 
-// TODO: language selector
-const locale = "es"; // "en" or "es"
-
 // enableMocking().then(() => {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <IntlProvider locale={locale} messages={messages[locale]}>
+    <LanguageProvider>
       <DocsProvider>
         <Home />
       </DocsProvider>
-    </IntlProvider>
+    </LanguageProvider>
   </StrictMode>,
 );
 // });

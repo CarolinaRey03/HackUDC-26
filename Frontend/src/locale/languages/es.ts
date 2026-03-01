@@ -14,6 +14,7 @@ export const es: I18nTemplate = {
       doc: "Se produjo un error al abrir el documento",
     },
     delete: "Se produjo un error al borrar el documento",
+    unsupportedType: "Tipo de fichero no soportado",
   },
   searchbar: {
     placeholder: {

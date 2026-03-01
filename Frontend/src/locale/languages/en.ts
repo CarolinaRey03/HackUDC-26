@@ -14,6 +14,7 @@ export const en: I18nTemplate = {
       doc: "An error ocurred while opening the document",
     },
     delete: "An error ocurred while deleting the document",
+    unsupportedType: "File type unsupported",
   },
   searchbar: {
     placeholder: {

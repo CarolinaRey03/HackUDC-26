@@ -7,13 +7,23 @@ import { SearchBar } from "@/Modules/SearchBar";
 import { Button } from "@/Modules/Common";
 import AddIcon from "@/assets/add.svg?react";
 import { FileUploaderModal } from "@/Modules/Modal";
+import Selector, { type SelectorOption } from "@/Modules/Common/Components/Selector";
+import { useLanguage } from "@/Context/LanguageContext";
 
 function Docs() {
   const { translate } = useI18n();
-  const { docs, updateDocs } = useDocs();
+  const { locale, setLocale } = useLanguage();
+  const { docs } = useDocs();
   const [showAddModal, setShowAddModal] = useState(false);
 
   const [filteredDocs, setFilteredDocs] = useState(docs);
+
+  const languageOptions: SelectorOption[] = [
+    { value: "es", label: translate("filter.language.es") },
+    { value: "en", label: translate("filter.language.en") },
+  ];
+
+  const selectedLanguage = languageOptions.find((opt) => opt.value === locale);
 
   const onSearch = (fileName: string) => {
     setFilteredDocs(docs.filter((doc) => doc.name.toLocaleLowerCase().startsWith(fileName.toLocaleLowerCase())));
@@ -34,7 +44,18 @@ function Docs() {
   return (
     <>
       <div className="docs">
-        <Title>{translate("explorer")}</Title>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+          <Title style={{ margin: 0 }}>{translate("explorer")}</Title>
+          <div style={{ width: "150px" }}>
+            <Selector
+              options={languageOptions}
+              selectedOption={selectedLanguage}
+              updateSelectedOption={(option) => setLocale(option.value as "en" | "es")}
+              placeholder={translate("filter.language.placeholder")}
+              showNoneOption={false}
+            />
+          </div>
+        </div>
         <SearchBar
           placeholder={translate("searchbar.placeholder.file_name")}
           onSearch={onSearch}

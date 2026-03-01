@@ -79,7 +79,7 @@ def get_document_by_id(id: str):
             media_type=content_type,
             content_disposition_type="inline",
         )
-        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        response.headers["Content-Disposition"] = f'inline; filename={filename}'
         return response
     except HTTPException:
         raise

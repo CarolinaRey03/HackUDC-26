@@ -1,14 +1,17 @@
 import { toast } from "sonner";
 
 function success(message: string) {
-  toast.success(message);
+  toast.success(message, {
+    className: "toast-msg__success",
+  });
 }
 
 function info(message: string) {
-  toast.info(message);
+  toast.info(message, {
+    className: "toast-msg__info",
+  });
 }
 
-// TODO: define custom style for toasts
 function error(message: string, infinite?: boolean) {
   toast.error(message, {
     duration: infinite ? Infinity : undefined,
