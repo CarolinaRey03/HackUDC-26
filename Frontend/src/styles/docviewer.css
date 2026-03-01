@@ -113,3 +113,106 @@
   margin-top: 0.5rem;
   text-align: right;
 }
+
+/* CsvViewer.css */
+
+/* --- 1. CLASE PARA EL WRAPPER PRINCIPAL DEL COMPONENTE --- */
+/* Agregamos esto para asegurar que el componente entero ocupe el espacio */
+.docviewer__csv,
+.docviewer__xls {
+  height: 100%;
+  display: flex;
+  flex-direction: column; /* Apila tabla y footer verticalmente */
+  overflow: hidden; /* Evita scroll doble */
+}
+
+/* --- 2. CONTENEDOR DE LA TABLA (SCROLL) --- */
+.csv-table-container {
+  /* Estética */
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  /* --- REGLAS CLAVE PARA EL SCROLL --- */
+  /* Flex: 1 hace que este div ocupe todo el espacio sobrante (restando el footer) */
+  flex: 1;
+
+  /* Ancho total */
+  width: 100%;
+
+  /* Scrollbars controlados por este contenedor */
+  overflow: auto;
+
+  /* Necesario para el sticky header */
+  position: relative;
+}
+
+/* --- LA TABLA --- */
+.csv-table {
+  border-collapse: separate; /* Mejor para sticky headers */
+  border-spacing: 0;
+  min-width: 100%;
+  font-size: 0.875rem;
+  text-align: left;
+  color: #374151;
+}
+
+/* --- CABECERA (THEAD) --- */
+.csv-thead {
+  background-color: #f3f4f6;
+}
+
+/* --- CELDAS DE CABECERA (TH) --- */
+.csv-th {
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Z-index para estar sobre el contenido */
+
+  background-color: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 2px solid #d1d5db;
+  white-space: nowrap;
+}
+
+/* --- FILAS Y CELDAS (TR / TD) --- */
+.csv-row {
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+}
+.csv-row:hover {
+  background-color: #f9fafb;
+}
+
+.csv-td {
+  padding: 0.75rem 1.5rem;
+  border-right: 1px solid #f3f4f6;
+  color: #4b5563;
+  white-space: nowrap; /* Fuerza scroll horizontal si es largo */
+}
+
+/* --- FOOTER --- */
+.csv-footer {
+  font-size: 0.75rem;
+  color: #6b7280;
+  padding: 0.5rem;
+  text-align: right;
+  /* El footer tendrá altura fija automática, la tabla ocupará el resto */
+  flex-shrink: 0;
+}
+
+/* --- MENSAJES DE ESTADO --- */
+.csv-status-loading,
+.csv-status-error,
+.csv-empty-message {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+.csv-status-error {
+  color: #ef4444;
+}

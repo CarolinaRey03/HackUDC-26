@@ -6,6 +6,7 @@ import OdtViewer from "./OdtViewer";
 import CsvViewer from "./CsvViewer";
 import BodyText from "@/Modules/Common/Components/BodyText";
 import useI18n from "@/hooks/useI18n";
+import XlsViewer from "./XlsViewer";
 
 interface DocViewerProps {
   file: File;
@@ -17,7 +18,6 @@ function DocViewer({ file }: DocViewerProps) {
   const { extension } = splitFilename(file.name);
 
   const decideViewer = (file: File, extension: string) => {
-    console.log({ extension });
     switch (extension.toLocaleLowerCase()) {
       case "pdf":
         return <PdfViewer file={file} />;
@@ -29,6 +29,10 @@ function DocViewer({ file }: DocViewerProps) {
         return <OdtViewer file={file} />;
       case "csv":
         return <CsvViewer file={file} />;
+      case "xlsx":
+      case "xls":
+      case "ods":
+        return <XlsViewer file={file} />;
       default:
         return <BodyText>{translate("error.unsupportedType")}</BodyText>;
     }
