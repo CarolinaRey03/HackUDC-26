@@ -17,6 +17,7 @@
   margin: 0 auto;
   padding: 0px;
   text-align: center;
+  overflow-y: hidden;
 }
 
 .bg {
