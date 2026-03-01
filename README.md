@@ -31,11 +31,11 @@ Se trata de una API RESTful robusta que actúa como la base para un sistema de i
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Backend:** Python + FastAPI.
-* **Base de Datos Vectorial:** Elasticsearch
-* **IA / Embeddings: `SentenceTransformers
+- **Backend:** `Python + FastAPI`.
+* **Base de Datos Vectorial:** `Elasticsearch`
+* **IA / Embeddings:** `SentenceTransformers`
 * **Procesamiento de Datos:** `Pandas`, `PyPDF2`, `python-docx`, `odfpy`.
-* **Infraestructura:** Docker & Docker Compose.
+* **Infraestructura:** `Docker` & `Docker Compose`.
 
 ---
 
@@ -74,7 +74,7 @@ docker compose up
 ```
 (**Nota**: La primera vez puede tardar un par de minutos mientras compila las librerías de IA y descarga la imagen de Elasticsearch. Las siguientes ejecuciones serán mucho más rápidas.)
 ### Paso 4: ¡A probar! 🎉
-Una vez que en la terminal veas el mensaje Application startup complete, la API estará funcionando.
+Una vez que en la terminal veas el mensaje **Application startup complete**, la API estará funcionando.
 
 Visita la documentación interactiva (Swagger UI) en tu navegador:
 👉 http://localhost:8000/docs
