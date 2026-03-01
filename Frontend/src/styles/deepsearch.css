@@ -1,0 +1,159 @@
+.deepsearch {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+
+  position: relative;
+}
+
+/* =========================================
+   DEFINICIÓN DE KEYFRAMES (ANIMACIONES)
+   ========================================= */
+
+/* Entrada Look-Left: Subir, Opacidad y Escala */
+@keyframes slide-in-up-look-left {
+  0% {
+    transform: translate(-50%, 100%) scale(0.1); /* Abajo y pequeño */
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1); /* Centro y normal */
+    opacity: 1;
+  }
+}
+
+/* Salida Look-Left: Bajar, Opacidad y Escala */
+@keyframes slide-out-down-look-left {
+  0% {
+    transform: translate(-50%, -50%) scale(1); /* Centro y normal */
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 100%) scale(0.1); /* Abajo y pequeño */
+    opacity: 0;
+  }
+}
+
+/* Reentrada Welcome: Opacidad y Escala (Gradual) */
+@keyframes fade-in-scale-welcome {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9); /* Un poco más pequeño */
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1); /* Tamaño normal */
+    opacity: 1;
+  }
+}
+
+/* Rebote infinito de la flecha (Se mantiene igual) */
+@keyframes arrow-bounce-left {
+  0%,
+  20%,
+  40%,
+  100% {
+    transform: scaleY(-1) translateX(0);
+  }
+  10% {
+    transform: scaleY(-1) translateX(-6px);
+  }
+  30% {
+    transform: scaleY(-1) translateX(-4px);
+  }
+}
+
+/* =========================================
+   ESTILOS DE LOS ELEMENTOS
+   ========================================= */
+
+.deepsearch__look-left {
+  width: 100%;
+  color: var(--color-text);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  /* Estado inicial por defecto: Oculto abajo */
+  transform: translate(-50%, 100%);
+  opacity: 0;
+  pointer-events: none; /* Para no interferir cuando está oculto */
+
+  & .title {
+    text-align: center;
+  }
+
+  & svg {
+    height: 150px;
+    width: 150px;
+    /* Mantenemos scaleY(-1) por defecto para la orientación */
+    transform: scaleY(-1);
+  }
+}
+
+/* Clase que activa la ENTRADA de Look-Left */
+.deepsearch__look-left--show {
+  pointer-events: auto; /* Activamos interacciones */
+
+  /* Animación combinada para el contenedor */
+  animation: slide-in-up-look-left 0.35s ease-out forwards;
+
+  & svg {
+    /* Activamos el rebote infinito con delay sincronizado */
+    animation: arrow-bounce-left 3s infinite 0.35s;
+  }
+}
+
+/* Clase que activa la SALIDA de Look-Left */
+.deepsearch__look-left--hide {
+  animation: slide-out-down-look-left 0.35s ease-in forwards;
+
+  & svg {
+    /* Cancelamos el rebote inmediatamente al salir */
+    animation: none;
+  }
+}
+
+/* ----------------------------------------- */
+
+.deepsearch__welcome {
+  width: 100%;
+  color: var(--color-text);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  /* Estado inicial por defecto: Oculto */
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & .title {
+    text-align: center;
+  }
+
+  & svg {
+    height: 200px;
+    width: 200px;
+    color: var(--color-text) !important;
+  }
+
+  & .body-text {
+    width: 200px;
+  }
+}
+
+/* Clase que activa la REAPARICIÓN gradual de Welcome */
+.deepsearch__welcome--show {
+  pointer-events: auto;
+  /* Animación de fade-in gradual */
+  animation: fade-in-scale-welcome 0.5s ease-out forwards;
+}

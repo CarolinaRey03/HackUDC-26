@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 
@@ -9,6 +10,7 @@ from app.services.documents_service import (
     index_document,
     list_documents,
     search_documents,
+    get_all_documents_filtered
 )
 
 router = APIRouter(prefix="/docs")
@@ -36,9 +38,12 @@ async def create_document(doc: UploadFile = File(...)):
 
 
 @router.get("/filtered", response_model=list[DocumentInfo])
-def get_filtered_documents(query: str, limit: int = 5):
+def get_filtered_documents(limit: int = 5, query: Optional[str] = None, language: Optional[str] = None, type: Optional[str] = None, date: Optional[int] = None):
     try:
-        return search_documents(query, limit)
+        if query:
+            return search_documents(limit, query, language=language, type=type, date=date)
+
+        return get_all_documents_filtered(limit, language=language, type=type, date=date)
     except Exception as e:
         _logger.exception("GET /docs/filtered failed: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -59,7 +64,13 @@ def delete_document_by_id(id: str):
 def get_document_by_id(id: str):
     try:
         file_path, filename, content_type = get_document(id)
-        return FileResponse(path=file_path, filename=filename, media_type=content_type)
+        response = FileResponse(
+            path=file_path,
+            media_type=content_type,
+            content_disposition_type="inline",
+        )
+        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        return response
     except HTTPException:
         raise
     except Exception as e:

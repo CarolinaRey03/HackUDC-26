@@ -1,0 +1,31 @@
+.searchbar {
+  box-sizing: border-box;
+  width: 100%;
+  height: 45px;
+  display: flex;
+  align-items: center;
+
+  padding-left: 7px;
+  padding-right: 7px;
+  border-radius: 10px;
+
+  background-color: var(--color-bg);
+}
+
+.searchbar__search-btn {
+  height: 30px;
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.searchbar__search-btn svg {
+  width: 20px;
+  height: 20px;
+}

@@ -1,0 +1,7 @@
+.docviewer {
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 30px;
+  padding-top: 30px;
+}

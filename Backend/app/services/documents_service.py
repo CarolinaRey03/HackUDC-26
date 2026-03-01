@@ -2,7 +2,10 @@ import io
 import os
 import uuid
 import pandas as pd
+from typing import Optional
 from fastapi import HTTPException, UploadFile, status
+
+from langdetect import detect
 
 from PyPDF2 import PdfReader
 from sympy import content
@@ -10,6 +13,7 @@ from sentence_transformers import SentenceTransformer
 from app.config import settings
 from app.core.logging import setup_logger
 from app.repositories.documents_repo import (
+    analyze_text_es,
     delete_document_es,
     get_document_metadata_es,
     index_document_es,
@@ -39,12 +43,14 @@ async def index_document(file: UploadFile) -> None:
     content_type = file.content_type or ""
 
     text = _extract_text(content, content_type, filename)
+    language = detect(text)
     chunks = _chunk_text(text)
     _logger.debug(
         "Chunks: %d — preview:\n%s", len(chunks), "\n".join(text.splitlines()[:6])
     )
 
-    embeddings = _get_model().encode(chunks).tolist()
+    analyzed_chunks = [analyze_text_es(chunk, language) for chunk in chunks]
+    embeddings = _get_model().encode(analyzed_chunks).tolist()
 
     file_id = str(uuid.uuid4())
     os.makedirs(settings.files_dir, exist_ok=True)
@@ -56,8 +62,9 @@ async def index_document(file: UploadFile) -> None:
         file_id=file_id,
         filename=filename,
         content_type=content_type,
+        language=language,
+        chunks=analyzed_chunks,
         embeddings=embeddings,
-        chunks=chunks
     )
 
 
@@ -81,9 +88,23 @@ def list_documents(limit: int) -> list[DocumentInfo]:
     return [DocumentInfo(**doc) for doc in list_documents_es(limit)]
 
 
-def search_documents(query: str, limit: int) -> list[DocumentInfo]:
-    embedding: list[float] = _get_model().encode([query])[0].tolist()
-    return [DocumentInfo(**doc) for doc in search_documents_es(embedding, limit)]
+def search_documents(
+    limit: int,
+    query: str,
+    language: Optional[str] = None,
+    type: Optional[str] = None,
+    date: Optional[int] = None,
+) -> list[DocumentInfo]:
+    embedding: list[float] = []
+
+    if query is not None:
+        embedding = _get_model().encode([query])[0].tolist()
+    return [
+        DocumentInfo(**doc)
+        for doc in search_documents_es(
+            embedding, limit, language=language, file_type=type, date=date
+        )
+    ]
 
 
 def delete_document(file_id: str) -> None:
@@ -112,6 +133,11 @@ def get_document(file_id: str) -> tuple[str, str, str]:
         )
 
     return file_path, meta["filename"], meta["content_type"]
+
+def get_all_documents_filtered(limit: int, language: Optional[str] = None,
+    type: Optional[str] = None,
+    date: Optional[int] = None) -> list[dict]:
+    return list_documents_es(limit, language=language, file_type=type, date=date)
 
 def _extract_text(content: bytes, content_type: str, filename: str) -> str:
     ct = (content_type or "").lower()

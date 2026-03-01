@@ -1,6 +1,7 @@
 from typing import Optional
 from os.path import splitext
 from elasticsearch import Elasticsearch, NotFoundError
+import time
 
 from app.config import settings
 
@@ -17,15 +18,30 @@ def _get_es_client() -> Elasticsearch:
     return _client
 
 
+def analyze_text_es(text: str, language: str) -> str:
+    """Returns the text after applying stopword removal (Spanish)."""
+    analyzer = "spanish" if language == "es" else "english"
+
+    client = _get_es_client()
+    response = client.indices.analyze(
+        body={"analyzer": analyzer, "text": text},
+    )
+
+    return " ".join(token["token"] for token in response["tokens"])
+
+
 def index_document_es(
     file_id: str,
     filename: str,
     content_type: str,
+    language: str,
+    chunks: list[str],
     embeddings: list[list[float]],
     chunks: list[str],
 ) -> None:
     client = _get_es_client()
-    for i, (embedding, chunk) in enumerate(zip(embeddings, chunks)):
+    created_at = int(time.time())
+    for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
         client.index(
             index=settings.elasticsearch_index,
             document={
@@ -33,27 +49,42 @@ def index_document_es(
                 "filename": filename,
                 "file_type": splitext(filename)[1],
                 "content_type": content_type,
+                "language": language,
+                "content": chunk,
                 "chunk_index": i,
                 "embedding": embedding,
-                "content": chunk,
+                "created_at": created_at,
             },
         )
 
 
-def list_documents_es(limit: int = 100) -> list[dict]:
+def list_documents_es(
+    limit: int = 100,
+    language: Optional[str] = None,
+    file_type: Optional[str] = None,
+    date: Optional[int] = None,
+) -> list[dict]:
     client = _get_es_client()
+    filters = _build_search_filters(language, file_type, date)
+
+    body: dict = {
+        "size": 0,
+        "aggs": {
+            "files": {
+                "terms": {"field": "file_id", "size": limit},
+                "aggs": {"name": {"terms": {"field": "filename", "size": 1}}},
+            }
+        },
+    }
+
+    if filters:
+        body["query"] = {"bool": {"filter": filters}}
+
     response = client.search(
         index=settings.elasticsearch_index,
-        body={
-            "size": 0,
-            "aggs": {
-                "files": {
-                    "terms": {"field": "file_id", "size": limit},
-                    "aggs": {"name": {"terms": {"field": "filename", "size": 1}}},
-                }
-            },
-        },
+        body=body,
     )
+
     return [
         {
             "id": bucket["key"],
@@ -63,21 +94,33 @@ def list_documents_es(limit: int = 100) -> list[dict]:
     ]
 
 
-def search_documents_es(embedding: list[float], limit: int = 5) -> list[dict]:
+def search_documents_es(
+    embedding: list[float],
+    limit: int = 5,
+    language: Optional[str] = None,
+    file_type: Optional[str] = None,
+    date: Optional[int] = None,
+) -> list[dict]:
     client = _get_es_client()
-    response = client.search(
-        index=settings.elasticsearch_index,
-        body={
-            "knn": {
-                "field": "embedding",
-                "query_vector": embedding,
-                "k": limit * 3,
-                "num_candidates": limit * 30,
-            },
-            # AÑADIDO: Pedimos a Elasticsearch que nos devuelva también el 'content'
-            "_source": ["file_id", "filename", "content"],
+
+    filters = _build_search_filters(language=language, file_type=file_type, date=date)
+
+    body: dict = {
+        "knn": {
+            "field": "embedding",
+            "query_vector": embedding,
+            "k": limit * 3,
+            "num_candidates": limit * 30,
         },
-    )
+            # AÑADIDO: Pedimos a Elasticsearch que nos devuelva también el 'content'
+        "_source": ["file_id", "filename", "content"],
+    }
+
+    if filters:
+        body["query"] = {"bool": {"filter": filters}}
+
+    response = client.search(index=settings.elasticsearch_index, body=body)
+
     seen: set[str] = set()
     results: list[dict] = []
     for hit in response["hits"]["hits"]:
@@ -93,6 +136,21 @@ def search_documents_es(embedding: list[float], limit: int = 5) -> list[dict]:
         if len(results) >= limit:
             break
     return results
+
+
+def _build_search_filters(
+    language: Optional[str] = None,
+    file_type: Optional[str] = None,
+    date: Optional[int] = None,
+) -> list[dict]:
+    filters: list[dict] = []
+    if language:
+        filters.append({"term": {"language.keyword": language}})
+    if file_type:
+        filters.append({"term": {"file_type.keyword": file_type}})
+    if date is not None:
+        filters.append({"range": {"created_at": {"gte": date}}})
+    return filters
 
 
 def delete_document_es(file_id: str) -> bool:
