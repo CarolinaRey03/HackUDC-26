@@ -11,11 +11,12 @@ interface SelectorProps {
   selectedOption: SelectorOption | undefined;
   updateSelectedOption: (option: SelectorOption) => void;
   placeholder: string;
+  showNoneOption?: boolean;
 }
 
 const customStyles = {
   // 1. El contenedor principal (input)
-  control: (styles, { isFocused }) => ({
+  control: (styles: any, { isFocused }: any) => ({
     ...styles,
     backgroundColor: "var(--color-bg-dark)",
     // Si está en foco, usamos un gris más claro (text-muted), si no, el borde normal
@@ -30,7 +31,7 @@ const customStyles = {
   }),
 
   // 2. El menú desplegable
-  menu: (styles) => ({
+  menu: (styles: any) => ({
     ...styles,
     backgroundColor: "var(--color-bg-dark)",
     border: "1px solid var(--color-border)",
@@ -41,7 +42,7 @@ const customStyles = {
   }),
 
   // 3. Las opciones de la lista
-  option: (styles, { isFocused, isSelected }) => ({
+  option: (styles: any, { isFocused, isSelected }: any) => ({
     ...styles,
     // Lógica de fondo:
     // - Seleccionado: bg-light (el gris más claro de tu paleta de fondos)
@@ -59,25 +60,25 @@ const customStyles = {
   }),
 
   // 4. El texto del valor seleccionado
-  singleValue: (styles) => ({
+  singleValue: (styles: any) => ({
     ...styles,
     color: "var(--color-text)",
   }),
 
   // 5. El texto mientras escribes
-  input: (styles) => ({
+  input: (styles: any) => ({
     ...styles,
     color: "var(--color-text)",
   }),
 
   // 6. El texto de ayuda (Placeholder)
-  placeholder: (styles) => ({
+  placeholder: (styles: any) => ({
     ...styles,
     color: "var(--color-text-muted)",
   }),
 
   // 7. La flechita de la derecha y la X de limpiar
-  dropdownIndicator: (styles, { isFocused }) => ({
+  dropdownIndicator: (styles: any, { isFocused }: any) => ({
     ...styles,
     color: isFocused ? "var(--color-text)" : "var(--color-text-muted)",
     "&:hover": {
@@ -85,7 +86,7 @@ const customStyles = {
     },
   }),
 
-  clearIndicator: (styles) => ({
+  clearIndicator: (styles: any) => ({
     ...styles,
     color: "var(--color-text-muted)",
     "&:hover": {
@@ -94,17 +95,23 @@ const customStyles = {
   }),
 
   // 8. La línea separadora entre la X y la flecha
-  indicatorSeparator: (styles) => ({
+  indicatorSeparator: (styles: any) => ({
     ...styles,
     backgroundColor: "var(--color-border)",
   }),
 };
 
-function Selector({ options, selectedOption, updateSelectedOption, placeholder }: SelectorProps) {
+function Selector({
+  options,
+  selectedOption,
+  updateSelectedOption,
+  placeholder,
+  showNoneOption = true,
+}: SelectorProps) {
   const { translate } = useI18n();
   const noneOption: SelectorOption = { value: "", label: translate("filter.none") };
 
-  const allOptions = [noneOption, ...options];
+  const allOptions = showNoneOption ? [noneOption, ...options] : options;
 
   return (
     <Select

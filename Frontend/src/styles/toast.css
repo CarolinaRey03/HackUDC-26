@@ -1,0 +1,20 @@
+.toast-msg__error {
+  background-color: var(--color-bg-dark) !important;
+  color: var(--color-error) !important;
+  border: 1px solid var(--color-error) !important;
+  border-radius: 12px !important;
+}
+
+.toast-msg__success {
+  background-color: var(--color-bg-dark) !important;
+  color: var(--color-success) !important;
+  border: 1px solid var(--color-success) !important;
+  border-radius: 12px !important;
+}
+
+.toast-msg__info {
+  background-color: var(--color-bg-dark) !important;
+  color: var(--color-info) !important;
+  border: 1px solid var(--color-info) !important;
+  border-radius: 12px !important;
+}

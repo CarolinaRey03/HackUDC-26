@@ -20,6 +20,13 @@
 .docs__doc-item {
   text-align: left;
   font-size: large;
+
+  display: flex;
+  align-items: center;
+
+  &:hover .docs__info-btn {
+    opacity: 1;
+  }
 }
 
 .docs__doc-item-btn {
@@ -68,4 +75,25 @@
   & svg {
     height: 100%;
   }
+}
+
+.docs__delete-btn {
+  box-sizing: border-box;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  background: none;
+  color: var(--color-error);
+}
+
+.docs__info-btn {
+  box-sizing: border-box;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  background: none;
+  color: var(--color-text);
+
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
 }

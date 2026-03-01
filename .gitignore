@@ -210,3 +210,16 @@ __marimo__/
 data/*
 files/*
 node_modules/
+
+# macOS
+.DS_Store
+
+# tool versions
+.tool-versions
+
+# Scripts that shouldn't be tracked
+Backend/update_es_metadata.py
+
+# Upload/data directories
+Backend/files/
+Backend/data/

@@ -7,6 +7,10 @@
   --color-border: hsl(0, 0%, 30%);
   --color-bg-gradient: linear-gradient(0deg, var(--color-bg-dark), var(--color-bg-light));
   --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.011), 0px 4px 4px hsla(0, 0%, 0%, 0.15);
+
+  --color-error: #c58f8f;
+  --color-success: #8fc58f;
+  --color-info: #8fadc5;
 }
 
 #root {

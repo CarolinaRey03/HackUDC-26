@@ -37,6 +37,9 @@ def index_document_es(
     language: str,
     chunks: list[str],
     embeddings: list[list[float]],
+    title: Optional[str] = None,
+    author: Optional[str] = None,
+    category: Optional[str] = None,
 ) -> None:
     client = _get_es_client()
     created_at = int(time.time())
@@ -53,6 +56,9 @@ def index_document_es(
                 "chunk_index": i,
                 "embedding": embedding,
                 "created_at": created_at,
+                "title": title,
+                "author": author,
+                "category": category,
             },
         )
 
@@ -71,7 +77,22 @@ def list_documents_es(
         "aggs": {
             "files": {
                 "terms": {"field": "file_id", "size": limit},
-                "aggs": {"name": {"terms": {"field": "filename", "size": 1}}},
+                "aggs": {
+                    "top_file_hits": {
+                        "top_hits": {
+                            "size": 1,
+                            "_source": [
+                                "filename",
+                                "title",
+                                "author",
+                                "category",
+                                "created_at",
+                                "file_type",
+                                "language",
+                            ],
+                        }
+                    }
+                },
             }
         },
     }
@@ -84,13 +105,22 @@ def list_documents_es(
         body=body,
     )
 
-    return [
-        {
-            "id": bucket["key"],
-            "name": bucket["name"]["buckets"][0]["key"],
-        }
-        for bucket in response["aggregations"]["files"]["buckets"]
-    ]
+    results = []
+    for bucket in response["aggregations"]["files"]["buckets"]:
+        source = bucket["top_file_hits"]["hits"]["hits"][0]["_source"]
+        results.append(
+            {
+                "id": bucket["key"],
+                "name": source["filename"],
+                "title": source.get("title"),
+                "author": source.get("author"),
+                "category": source.get("category"),
+                "created_at": source.get("created_at"),
+                "file_type": source.get("file_type"),
+                "language": source.get("language"),
+            }
+        )
+    return results
 
 
 def search_documents_es(
@@ -112,7 +142,17 @@ def search_documents_es(
             "num_candidates": limit * 30,
         },
             # AÑADIDO: Pedimos a Elasticsearch que nos devuelva también el 'content'
-        "_source": ["file_id", "filename", "content"],
+        "_source": [
+            "file_id",
+            "filename",
+            "content",
+            "title",
+            "author",
+            "category",
+            "created_at",
+            "file_type",
+            "language",
+        ],
     }
 
     if filters:
@@ -130,7 +170,13 @@ def search_documents_es(
             results.append({
                 "id": fid, 
                 "name": hit["_source"]["filename"],
-                "match_text": hit["_source"].get("content", "")
+                "match_text": hit["_source"].get("content", ""),
+                "title": hit["_source"].get("title"),
+                "author": hit["_source"].get("author"),
+                "category": hit["_source"].get("category"),
+                "created_at": hit["_source"].get("created_at"),
+                "file_type": hit["_source"].get("file_type"),
+                "language": hit["_source"].get("language"),
             })
         if len(results) >= limit:
             break
@@ -169,7 +215,16 @@ def get_document_metadata_es(file_id: str) -> Optional[dict]:
             index=settings.elasticsearch_index,
             body={
                 "query": {"term": {"file_id": file_id}},
-                "_source": ["filename", "content_type"],
+                "_source": [
+                    "filename",
+                    "content_type",
+                    "title",
+                    "author",
+                    "category",
+                    "created_at",
+                    "file_type",
+                    "language",
+                ],
                 "size": 1,
             },
         )
@@ -181,4 +236,10 @@ def get_document_metadata_es(file_id: str) -> Optional[dict]:
     return {
         "filename": hits[0]["_source"]["filename"],
         "content_type": hits[0]["_source"]["content_type"],
+        "title": hits[0]["_source"].get("title"),
+        "author": hits[0]["_source"].get("author"),
+        "category": hits[0]["_source"].get("category"),
+        "created_at": hits[0]["_source"].get("created_at"),
+        "file_type": hits[0]["_source"].get("file_type"),
+        "language": hits[0]["_source"].get("language"),
     }

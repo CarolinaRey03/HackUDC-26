@@ -120,6 +120,46 @@
 
 /* ----------------------------------------- */
 
+@keyframes bounceWithWait {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: ease-out;
+  }
+
+  6% {
+    transform: translateY(-40px);
+    animation-timing-function: ease-in;
+  }
+
+  12% {
+    transform: translateY(0);
+    animation-timing-function: ease-out;
+  }
+
+  18% {
+    transform: translateY(-20px);
+    animation-timing-function: ease-in;
+  }
+
+  24% {
+    transform: translateY(0);
+    animation-timing-function: ease-out;
+  }
+
+  27% {
+    transform: translateY(-10px);
+    animation-timing-function: ease-in;
+  }
+
+  30% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
 .deepsearch__welcome {
   width: 100%;
   color: var(--color-text);
@@ -144,6 +184,10 @@
     height: 200px;
     width: 200px;
     color: var(--color-text) !important;
+
+    animation-name: bounceWithWait; /* Nombre de la animación */
+    animation-duration: 4s; /* El bucle completo dura 5s */
+    animation-iteration-count: infinite; /* Se repite para siempre */
   }
 
   & .body-text {
@@ -156,4 +200,11 @@
   pointer-events: auto;
   /* Animación de fade-in gradual */
   animation: fade-in-scale-welcome 0.5s ease-out forwards;
+}
+
+.deepsearch__banner {
+  position: absolute;
+  top: 0;
+  width: 300px;
+  object-fit: cover;
 }

@@ -10,6 +10,7 @@ import PerrilloIcon from "@/assets/icon.svg?react";
 import TurnLeftIcon from "@/assets/turn-left.svg?react";
 import { DocViewer } from "@/Modules/DocViewer";
 import { Filters } from "@/Modules/Filters";
+import banner from "@/assets/banner.png";
 
 export default function DeepSearch() {
   const { updateDocs, currentDoc, currentFilters, updateFilters } = useDocs();
@@ -20,9 +21,7 @@ export default function DeepSearch() {
 
   const isFirstRender = useRef(true);
 
-  // Efecto para inicializar el Welcome con la clase --show al cargar
   useEffect(() => {
-    // Comprobamos si hay filtros activos para no mostrar el welcome si ya hay búsqueda
     const hasActiveFilters =
       (currentFilters.query && currentFilters.query.trim() !== "") ||
       currentFilters.date ||
@@ -127,6 +126,7 @@ export default function DeepSearch() {
         <DocViewer file={currentDoc} />
       ) : (
         <>
+          <img src={banner} className="deepsearch__banner" alt="Banner" />
           <div className={getLookLeftClasses()}>
             <TurnLeftIcon />
             <BodyText>{translate("deepsearch.lookleft")}</BodyText>

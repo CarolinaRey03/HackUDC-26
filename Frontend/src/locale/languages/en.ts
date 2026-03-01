@@ -13,6 +13,8 @@ export const en: I18nTemplate = {
     open: {
       doc: "An error ocurred while opening the document",
     },
+    delete: "An error ocurred while deleting the document",
+    unsupportedType: "File type unsupported",
   },
   searchbar: {
     placeholder: {
@@ -23,6 +25,17 @@ export const en: I18nTemplate = {
   modal: {
     upload: "Upload",
     uploadTitle: "Upload a document",
+    metadata: {
+      header: "Document Information",
+      name: "Filename",
+      title: "Title",
+      author: "Author",
+      category: "Category",
+      language: "Language",
+      size: "Size",
+      type: "Type",
+      modified: "Date",
+    },
   },
   uploadFile: {
     info: "Uploading document...",
@@ -40,5 +53,21 @@ export const en: I18nTemplate = {
       es: "Spanish",
     },
     none: "None",
+    type: {
+      placeholder: "Type",
+      pdf: "PDF",
+      docx: "DOCX",
+      odt: "ODT",
+      csv: "CSV",
+      txt: "TXT",
+      xls: "XLS",
+      ods: "ODS",
+      xlsx: "XLSX",
+    },
+    sort: {
+      placeholder: "Sort",
+      asc: "A-Z",
+      desc: "Z-A",
+    },
   },
 };

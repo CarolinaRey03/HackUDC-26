@@ -70,6 +70,38 @@ def delete_document_by_id(id: str):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@router.get("/{id}/info", response_model=DocumentInfo)
+def get_document_info(id: str):
+    try:
+        from app.repositories.documents_repo import get_document_metadata_es
+        from app.config import settings
+        import os
+        
+        meta = get_document_metadata_es(id)
+        if meta is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+        
+        file_path = os.path.join(settings.files_dir, id)
+        size = os.path.getsize(file_path) if os.path.exists(file_path) else None
+        
+        return DocumentInfo(
+            id=id,
+            name=meta["filename"],
+            title=meta.get("title"),
+            author=meta.get("author"),
+            category=meta.get("category"),
+            created_at=meta.get("created_at"),
+            file_type=meta.get("file_type"),
+            language=meta.get("language"),
+            size=size
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        _logger.exception("GET /docs/%s/info failed: %s", id, e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @router.get("/{id}", response_class=FileResponse)
 def get_document_by_id(id: str):
     try:
@@ -79,7 +111,7 @@ def get_document_by_id(id: str):
             media_type=content_type,
             content_disposition_type="inline",
         )
-        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        response.headers["Content-Disposition"] = f'inline; filename={filename}'
         return response
     except HTTPException:
         raise
