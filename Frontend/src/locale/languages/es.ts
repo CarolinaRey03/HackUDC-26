@@ -25,6 +25,17 @@ export const es: I18nTemplate = {
   modal: {
     upload: "Subir",
     uploadTitle: "Sube un documento",
+    metadata: {
+      header: "Información del documento",
+      name: "Fichero",
+      title: "Título",
+      author: "Autor",
+      category: "Categoría",
+      language: "Idioma",
+      size: "Tamaño",
+      type: "Tipo",
+      modified: "Fecha",
+    },
   },
   uploadFile: {
     info: "Subiendo documento...",
@@ -52,6 +63,11 @@ export const es: I18nTemplate = {
       xls: "XLS",
       ods: "ODS",
       xlsx: "XLSX",
+    },
+    sort: {
+      placeholder: "Ordenar",
+      asc: "A-Z",
+      desc: "Z-A",
     },
   },
 };

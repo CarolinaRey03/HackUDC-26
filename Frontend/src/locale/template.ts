@@ -7,6 +7,17 @@ export interface I18nTemplate {
   modal: {
     uploadTitle: string;
     upload: string;
+    metadata: {
+      header: string;
+      name: string;
+      title: string;
+      author: string;
+      category: string;
+      language: string;
+      size: string;
+      type: string;
+      modified: string;
+    };
   };
   uploadFile: {
     info: string;
@@ -50,6 +61,11 @@ export interface I18nTemplate {
       xls: string;
       ods: string;
       xlsx: string;
+    };
+    sort: {
+      placeholder: string;
+      asc: string;
+      desc: string;
     };
   };
 }

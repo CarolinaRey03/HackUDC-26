@@ -9,12 +9,14 @@ import AddIcon from "@/assets/add.svg?react";
 import { FileUploaderModal } from "@/Modules/Modal";
 import Selector, { type SelectorOption } from "@/Modules/Common/Components/Selector";
 import { useLanguage } from "@/Context/LanguageContext";
+import SortSelector from "./SortSelector";
 
 function Docs() {
   const { translate } = useI18n();
   const { locale, setLocale } = useLanguage();
   const { docs } = useDocs();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const [filteredDocs, setFilteredDocs] = useState(docs);
 
@@ -41,19 +43,34 @@ function Docs() {
     setFilteredDocs(docs);
   }, [docs]);
 
+  const sortedDocs = [...filteredDocs].sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+    if (sortOrder === "asc") {
+      return nameA.localeCompare(nameB);
+    } else {
+      return nameB.localeCompare(nameA);
+    }
+  });
+
   return (
     <>
       <div className="docs">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
           <Title style={{ margin: 0 }}>{translate("explorer")}</Title>
-          <div style={{ width: "150px" }}>
-            <Selector
-              options={languageOptions}
-              selectedOption={selectedLanguage}
-              updateSelectedOption={(option) => setLocale(option.value as "en" | "es")}
-              placeholder={translate("filter.language.placeholder")}
-              showNoneOption={false}
-            />
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <div style={{ width: "150px" }}>
+              <SortSelector sortOrder={sortOrder} setSortOrder={setSortOrder} />
+            </div>
+            <div style={{ width: "150px" }}>
+              <Selector
+                options={languageOptions}
+                selectedOption={selectedLanguage}
+                updateSelectedOption={(option) => setLocale(option.value as "en" | "es")}
+                placeholder={translate("filter.language.placeholder")}
+                showNoneOption={false}
+              />
+            </div>
           </div>
         </div>
         <SearchBar
@@ -62,7 +79,7 @@ function Docs() {
           onSearchNoQuery={onSearchNoQuery}
         />
         <ul className="docs__list">
-          {filteredDocs.map((doc) => (
+          {sortedDocs.map((doc) => (
             <Doc key={doc.id} doc={doc} />
           ))}
         </ul>

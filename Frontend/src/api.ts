@@ -12,6 +12,13 @@ export const BASE_URL = "http://localhost:8000";
 export interface DocInfo {
   id: string;
   name: string;
+  title?: string;
+  author?: string;
+  category?: string;
+  created_at?: number;
+  file_type?: string;
+  language?: string;
+  size?: number;
 }
 
 export interface DocResponse {
@@ -114,6 +121,20 @@ export const getDocById = async (id: string, fileNameFallback?: string): Promise
   const type = blob.type || "application/octet-stream";
 
   return new File([blob], fileName, { type });
+};
+export const getDocInfo = async (id: string): Promise<DocInfo> => {
+  const response = await fetch(`${BASE_URL}/docs/${id}/info`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching document info: ${response.statusText}`);
+  }
+
+  return response.json();
 };
 
 export const deleteDoc = async (id: string): Promise<void> => {

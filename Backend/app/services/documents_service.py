@@ -22,6 +22,7 @@ from app.repositories.documents_repo import (
 )
 from app.schemas.documents_schemas import DocumentInfo
 from odf.opendocument import load
+from odf import meta, teletype, dc
 from odf.text import P
 from docx import Document
 
@@ -45,6 +46,58 @@ async def index_document(file: UploadFile) -> None:
     text = _extract_text(content, content_type, filename)
     language = detect(text)
     chunks = _chunk_text(text)
+    
+    # Metadata extraction
+    title = None
+    author = None
+    category = "Other"
+    
+    ct = content_type.lower()
+    name_lower = filename.lower()
+    
+    if ct == "application/pdf" or name_lower.endswith(".pdf"):
+        try:
+            reader = PdfReader(io.BytesIO(content))
+            # Rename to avoid shadowing the 'meta' import
+            pdf_info = reader.metadata
+            title = pdf_info.get("/Title")
+            author = pdf_info.get("/Author")
+            
+            # Additional fallback for common keys
+            if not title: title = pdf_info.get("/Subject")
+            if not author: author = pdf_info.get("/Creator")
+            
+            category = "Document"
+        except Exception as e:
+            _logger.error(f"Error extracting PDF metadata: {e}")
+            pass
+    elif "wordprocessingml" in ct or name_lower.endswith(".docx"):
+        try:
+            doc = Document(io.BytesIO(content))
+            prop = doc.core_properties
+            title = prop.title if prop.title else None
+            author = prop.author if prop.author else None
+            category = "Document"
+        except Exception:
+            pass
+    elif "spreadsheet" in ct or name_lower.endswith((".xls", ".xlsx", ".csv", ".ods")):
+        category = "Spreadsheet"
+    elif "text/plain" in ct or name_lower.endswith(".txt"):
+        category = "Text"
+    elif "oasis.opendocument.text" in ct or name_lower.endswith((".odt", ".odf")):
+        try:
+            odf_doc = load(io.BytesIO(content))
+            titles = odf_doc.meta.getElementsByType(dc.Title)
+            creators = odf_doc.meta.getElementsByType(dc.Creator)
+            initial_creators = odf_doc.meta.getElementsByType(meta.InitialCreator)
+            
+            title = teletype.get_text(titles[0]) if titles else None
+            author = teletype.get_text(creators[0]) if creators else \
+                     (teletype.get_text(initial_creators[0]) if initial_creators else None)
+            category = "Document"
+        except Exception:
+            pass
+
     _logger.debug(
         "Chunks: %d — preview:\n%s", len(chunks), "\n".join(text.splitlines()[:6])
     )
@@ -65,6 +118,9 @@ async def index_document(file: UploadFile) -> None:
         language=language,
         chunks=analyzed_chunks,
         embeddings=embeddings,
+        title=title,
+        author=author,
+        category=category
     )
 
 
@@ -156,7 +212,7 @@ def _extract_text(content: bytes, content_type: str, filename: str) -> str:
         doc = Document(io.BytesIO(content))
         return "\n".join(p.text for p in doc.paragraphs)
 
-    if "application/vnd.oasis.opendocument.text" in ct or (name.endswith(".odf") and not name.endswith(".ods")):
+    if "application/vnd.oasis.opendocument.text" in ct or (name.endswith((".odt", ".odf")) and not name.endswith(".ods")):
         odf_doc = load(io.BytesIO(content))
         return "\n".join(str(p) for p in odf_doc.body.getElementsByType(P))
 
