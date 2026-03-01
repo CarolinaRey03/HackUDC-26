@@ -7,6 +7,12 @@ export const en: I18nTemplate = {
       all_docs: "An error occurred while retrieving the documents",
       filtered_docs: "An error occurred while executing the query",
     },
+    upload: {
+      all_docs: "An error occurred while updating documents",
+    },
+    open: {
+      doc: "An error ocurred while opening the document",
+    },
   },
   searchbar: {
     placeholder: {
@@ -22,5 +28,9 @@ export const en: I18nTemplate = {
     info: "Uploading document...",
     success: "El documento se subió con éxito",
     error: "Error al subir el documento",
+  },
+  deepsearch: {
+    lookleft: "Look at the result",
+    welcome: "Do a search on your documents",
   },
 };

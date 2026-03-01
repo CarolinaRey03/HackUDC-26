@@ -1,13 +1,14 @@
 import io
 import os
 import uuid
-
+import pandas as pd
 from typing import Optional
 from fastapi import HTTPException, UploadFile, status
 
 from langdetect import detect
 
 from PyPDF2 import PdfReader
+from sympy import content
 from sentence_transformers import SentenceTransformer
 from app.config import settings
 from app.core.logging import setup_logger
@@ -155,12 +156,50 @@ def _extract_text(content: bytes, content_type: str, filename: str) -> str:
         doc = Document(io.BytesIO(content))
         return "\n".join(p.text for p in doc.paragraphs)
 
-    if ct == "application/vnd.oasis.opendocument.text" and name.endswith(".odt"):
+    if "application/vnd.oasis.opendocument.text" in ct or (name.endswith(".odf") and not name.endswith(".ods")):
         odf_doc = load(io.BytesIO(content))
         return "\n".join(str(p) for p in odf_doc.body.getElementsByType(P))
 
+    if ct in ["text/csv", "application/csv"] or name.endswith(".csv"):
+        try:
+            texto_csv = content.decode("utf-8")
+        except UnicodeDecodeError:
+            texto_csv = content.decode("latin1", errors="replace")
+            texto_limpio = texto_csv.replace(";", " ").replace(",", " ")
+        return texto_limpio
+
     if ct == "text/plain" and name.endswith(".txt"):
         return content.decode("utf-8", errors="replace")
+
+    spreadsheet_extensions = (".xlsx", ".xls", ".ods")
+    spreadsheet_types = [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", # xlsx
+        "application/vnd.ms-excel",                                          # xls
+        "application/vnd.oasis.opendocument.spreadsheet"                     # ods
+    ]
+
+    if ct in spreadsheet_types or name.endswith(spreadsheet_extensions):
+
+        try:
+            engine = 'odf' if name.endswith('.ods') or 'opendocument.spreadsheet' in ct else None
+
+            dfs = pd.read_excel(io.BytesIO(content), sheet_name=None, engine=engine)
+            text_parts = []
+
+            for sheet_name, df in dfs.items():
+                csv_string = df.to_csv(sep=" ", index=False, header=False, na_rep="")
+
+                lineas_limpias = [linea.strip() for linea in csv_string.splitlines() if linea.strip()]
+                if lineas_limpias:
+                    text_parts.append("\n".join(lineas_limpias))
+
+            return "\n".join(text_parts)
+
+        except Exception as e:
+            _logger.error(f"Error procesando hoja de cálculo con pandas: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Error al procesar el archivo Excel/ODS"
+            )
 
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST, detail="Document format is not valid"

@@ -74,7 +74,13 @@ def delete_document_by_id(id: str):
 def get_document_by_id(id: str):
     try:
         file_path, filename, content_type = get_document(id)
-        return FileResponse(path=file_path, filename=filename, media_type=content_type)
+        response = FileResponse(
+            path=file_path,
+            media_type=content_type,
+            content_disposition_type="inline",
+        )
+        response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        return response
     except HTTPException:
         raise
     except Exception as e:

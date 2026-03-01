@@ -7,6 +7,12 @@ export const es: I18nTemplate = {
       all_docs: "Se ha producido un error al recuperar los documentos",
       filtered_docs: "Se ha producido un error al ejecutar la consulta",
     },
+    upload: {
+      all_docs: "Se produjo un error al actualizar los documentos",
+    },
+    open: {
+      doc: "Se produjo un error al abrir el documento",
+    },
   },
   searchbar: {
     placeholder: {
@@ -22,5 +28,9 @@ export const es: I18nTemplate = {
     info: "Subiendo documento...",
     success: "El documento se subió con éxito",
     error: "Error al subir el documento",
+  },
+  deepsearch: {
+    lookleft: "Mira el resultado",
+    welcome: "Haz una búqueda sobre tus documentos",
   },
 };

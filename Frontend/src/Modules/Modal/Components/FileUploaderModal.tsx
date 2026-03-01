@@ -1,13 +1,15 @@
 import { useState, type ChangeEvent } from "react";
 import Modal from "./Modal";
 import UploadIcon from "@/assets/upload.svg?react";
-import DocText from "@/Modules/Docs/Components/DocText";
+import { DocText } from "@/Modules/Docs";
 import { splitFilename } from "@/utls/formatters";
 import { Button } from "@/Modules/Common";
 import useI18n from "@/hooks/useI18n";
-import Title from "@/Modules/Common/Components/Title";
-import { uploadDoc } from "@/api";
+import { Title } from "@/Modules/Common";
+import { getAllDocs, uploadDoc } from "@/api";
 import { toastMsg } from "@/utls/toastMsg";
+import { RESULTS_LIMIT } from "@/utls/constants";
+import { useDocs } from "@/Context/DocsContext";
 
 interface FileUploaderProps {
   onClose: () => void;
@@ -15,6 +17,7 @@ interface FileUploaderProps {
 
 export default function FileUploaderModal({ onClose }: FileUploaderProps) {
   const { translate } = useI18n();
+  const { updateDocs } = useDocs();
   const [file, setFile] = useState<File | null>(null);
   const { name, extension } = splitFilename(file?.name ?? "");
 
@@ -30,7 +33,14 @@ export default function FileUploaderModal({ onClose }: FileUploaderProps) {
     toastMsg.info(translate("uploadFile.info"));
 
     uploadDoc(file)
-      .then(() => toastMsg.success(translate("uploadFile.success")))
+      .then(() => {
+        toastMsg.success(translate("uploadFile.success"));
+        setTimeout(() => {
+          getAllDocs(RESULTS_LIMIT)
+            .then(updateDocs)
+            .catch(() => toastMsg.error(translate("error.upload.all_docs")));
+        }, 1_000);
+      })
       .catch(() => toastMsg.error(translate("uploadFile.error")));
 
     onClose();

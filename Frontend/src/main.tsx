@@ -19,7 +19,7 @@ async function enableMocking() {
 // TODO: language selector
 const locale = "es"; // "en" or "es"
 
-enableMocking().then(() => {
+// enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <IntlProvider locale={locale} messages={messages[locale]}>
@@ -29,4 +29,4 @@ enableMocking().then(() => {
       </IntlProvider>
     </StrictMode>,
   );
-});
+// });

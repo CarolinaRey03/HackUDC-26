@@ -37,6 +37,7 @@ def index_document_es(
     language: str,
     chunks: list[str],
     embeddings: list[list[float]],
+    chunks: list[str],
 ) -> None:
     client = _get_es_client()
     created_at = int(time.time())
@@ -111,7 +112,8 @@ def search_documents_es(
             "k": limit * 3,
             "num_candidates": limit * 30,
         },
-        "_source": ["file_id", "filename"],
+            # AÑADIDO: Pedimos a Elasticsearch que nos devuelva también el 'content'
+        "_source": ["file_id", "filename", "content"],
     }
 
     if filters:
@@ -125,7 +127,12 @@ def search_documents_es(
         fid = hit["_source"]["file_id"]
         if fid not in seen:
             seen.add(fid)
-            results.append({"id": fid, "name": hit["_source"]["filename"]})
+            # AÑADIDO: Devolvemos el fragmento de texto que hizo match
+            results.append({
+                "id": fid, 
+                "name": hit["_source"]["filename"],
+                "match_text": hit["_source"].get("content", "")
+            })
         if len(results) >= limit:
             break
     return results

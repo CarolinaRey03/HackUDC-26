@@ -38,3 +38,9 @@
   font-size: 25px;
   margin-top: 0;
 }
+
+.body-text {
+  color: var(--color-text);
+  font-size: 19px;
+  font-weight: 500;
+}

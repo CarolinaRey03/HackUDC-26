@@ -19,7 +19,7 @@ function Docs() {
   const [filteredDocs, setFilteredDocs] = useState(docs);
 
   const onSearch = (fileName: string) => {
-    setFilteredDocs(docs.filter((doc) => doc.name.startsWith(fileName)));
+    setFilteredDocs(docs.filter((doc) => doc.name.toLocaleLowerCase().startsWith(fileName.toLocaleLowerCase())));
   };
 
   const onSearchNoQuery = () => {
@@ -33,7 +33,7 @@ function Docs() {
   useEffect(() => {
     getAllDocs(RESULTS_LIMIT)
       .then(updateDocs)
-      .catch(() => toastMsg.error("error.fetch.all_docs"));
+      .catch(() => toastMsg.error(translate("error.fetch.all_docs")));
   }, []);
 
   useEffect(() => {
