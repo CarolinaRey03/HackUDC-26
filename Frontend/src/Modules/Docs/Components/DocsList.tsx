@@ -1,6 +1,3 @@
-import { getAllDocs } from "@/api";
-import { RESULTS_LIMIT } from "@/utls/constants";
-import { toastMsg } from "@/utls/toastMsg";
 import { useEffect, useState } from "react";
 import Doc from "./Doc";
 import Title from "@/Modules/Common/Components/Title";
@@ -29,12 +26,6 @@ function Docs() {
   const onAddDoc = () => {
     setShowAddModal((prev) => !prev);
   };
-
-  useEffect(() => {
-    getAllDocs(RESULTS_LIMIT)
-      .then(updateDocs)
-      .catch(() => toastMsg.error(translate("error.fetch.all_docs")));
-  }, []);
 
   useEffect(() => {
     setFilteredDocs(docs);

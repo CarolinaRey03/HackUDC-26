@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SearchBar } from "@/Modules/SearchBar";
 import BodyText from "@/Modules/Common/Components/BodyText";
 import useI18n from "@/hooks/useI18n";
@@ -9,38 +9,47 @@ import { RESULTS_LIMIT } from "@/utls/constants";
 import PerrilloIcon from "@/assets/icon.svg?react";
 import TurnLeftIcon from "@/assets/turn-left.svg?react";
 import { DocViewer } from "@/Modules/DocViewer";
+import { Filters } from "@/Modules/Filters";
 
 export default function DeepSearch() {
-  const { updateDocs, currentDoc } = useDocs();
+  const { updateDocs, currentDoc, currentFilters, updateFilters } = useDocs();
   const { translate } = useI18n();
 
   const [queryWritten, setQueryWritten] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
+  const isFirstRender = useRef(true);
+
   // Efecto para inicializar el Welcome con la clase --show al cargar
   useEffect(() => {
-    if (!queryWritten) {
+    // Comprobamos si hay filtros activos para no mostrar el welcome si ya hay búsqueda
+    const hasActiveFilters =
+      (currentFilters.query && currentFilters.query.trim() !== "") ||
+      currentFilters.date ||
+      currentFilters.language ||
+      currentFilters.limit ||
+      currentFilters.type;
+
+    if (!queryWritten && !hasActiveFilters) {
       const timer = setTimeout(() => {
         const el = document.querySelector(".deepsearch__welcome");
         if (el) el.classList.add("deepsearch__welcome--show");
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, []); // Se ejecuta solo al montar
+  }, []);
 
   const onSearch = (query: string) => {
-    setQueryWritten(true);
-    setIsExiting(false);
-
-    getFilteredDocs(query, RESULTS_LIMIT)
-      .then(updateDocs)
-      .catch(() => toastMsg.error(translate("error.fetch.filtered_docs")));
+    updateFilters({ ...currentFilters, query });
   };
 
   const onSearchNoQuery = () => {
     setIsExiting(true);
 
-    // Esperamos a que termine la animación (350ms según CSS)
+    if (currentFilters.query && currentFilters.query !== "") {
+      updateFilters({ ...currentFilters, query: "" });
+    }
+
     setTimeout(() => {
       setIsExiting(false);
       setQueryWritten(false);
@@ -62,6 +71,56 @@ export default function DeepSearch() {
     return "deepsearch__welcome";
   };
 
+  // Efecto principal: Carga de datos y control de animaciones
+  useEffect(() => {
+    const hasActiveFilters =
+      (currentFilters.query && currentFilters.query.trim() !== "") ||
+      currentFilters.date ||
+      currentFilters.language ||
+      currentFilters.limit ||
+      currentFilters.type;
+
+    // --- LÓGICA DE MONTAJE INICIAL ---
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+
+      if (hasActiveFilters) {
+        // Caso A: Recarga de página con filtros persistidos -> Buscamos y mostramos look-left
+        setQueryWritten(true);
+        getFilteredDocs(currentFilters)
+          .then(updateDocs)
+          .catch(() => toastMsg.error(translate("error.fetch.filtered_docs")));
+      } else {
+        // Caso B: Carga limpia -> Cargamos todos los docs PERO mantenemos Welcome visualmente
+        getAllDocs(RESULTS_LIMIT)
+          .then(updateDocs)
+          .catch(() => toastMsg.error(translate("error.fetch.all_docs")));
+      }
+      return; // Salimos para no ejecutar la lógica de actualización estándar
+    }
+
+    // --- LÓGICA DE ACTUALIZACIÓN (cuando cambian los filtros después del inicio) ---
+    if (hasActiveFilters) {
+      setQueryWritten(true);
+      setIsExiting(false);
+
+      getFilteredDocs(currentFilters)
+        .then(updateDocs)
+        .catch(() => toastMsg.error(translate("error.fetch.filtered_docs")));
+    } else {
+      // Solo ejecutamos la animación de salida si realmente estábamos en modo búsqueda
+      if (queryWritten) {
+        onSearchNoQuery();
+      } else {
+        // Caso borde: si se limpiaron filtros sin haber buscado (raro, pero posible)
+        // aseguramos que se carguen todos los docs
+        getAllDocs(RESULTS_LIMIT)
+          .then(updateDocs)
+          .catch(() => toastMsg.error(translate("error.fetch.all_docs")));
+      }
+    }
+  }, [currentFilters]);
+
   return (
     <div className="deepsearch">
       {currentDoc ? (
@@ -79,7 +138,7 @@ export default function DeepSearch() {
           </div>
         </>
       )}
-
+      <Filters />
       <SearchBar
         onSearch={onSearch}
         onSearchNoQuery={onSearchNoQuery}
