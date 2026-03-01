@@ -36,6 +36,8 @@ Se trata de una API RESTful robusta que actúa como la base para un sistema de i
 * **IA / Embeddings:** `SentenceTransformers`
 * **Procesamiento de Datos:** `Pandas`, `PyPDF2`, `python-docx`, `odfpy`.
 * **Infraestructura:** `Docker` & `Docker Compose`.
+* **Frontend:** `React`.
+
 
 ---
 
