@@ -28,7 +28,7 @@ _logger = setup_logger(__name__)
 _model: SentenceTransformer | None = None
 
 
-def _get_model() -> SentenceTransformer:
+def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
         _logger.debug("Loading embedding model: %s", settings.embedding_model)
@@ -49,7 +49,7 @@ async def index_document(file: UploadFile) -> None:
     )
 
     analyzed_chunks = [analyze_text_es(chunk, language) for chunk in chunks]
-    embeddings = _get_model().encode(analyzed_chunks).tolist()
+    embeddings = get_model().encode(analyzed_chunks).tolist()
 
     file_id = str(uuid.uuid4())
     os.makedirs(settings.files_dir, exist_ok=True)
@@ -97,7 +97,7 @@ def search_documents(
     embedding: list[float] = []
 
     if query is not None:
-        embedding = _get_model().encode([query])[0].tolist()
+        embedding = get_model().encode([query])[0].tolist()
     return [
         DocumentInfo(**doc)
         for doc in search_documents_es(
