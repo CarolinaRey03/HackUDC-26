@@ -10,9 +10,8 @@ logger = logging.getLogger(__name__)
 def init_index(client: Elasticsearch) -> None:
     index = settings.elasticsearch_index
     
-    # Retry logic to wait for ES to be fully ready
-    max_retries = 10
-    for i in range(max_retries):
+    cnt = 0
+    while True:
         try:
             if client.indices.exists(index=index):
                 logger.info(f"Index '{index}' already exists.")
@@ -43,10 +42,7 @@ def init_index(client: Elasticsearch) -> None:
             )
             logger.info(f"Index '{index}' created successfully.")
             return
-        except ConnectionError as e:
-            if i < max_retries - 1:
-                logger.warning(f"Elasticsearch not ready (attempt {i+1}/{max_retries}). Retrying in 5s...")
-                time.sleep(5)
-            else:
-                logger.error("Could not connect to Elasticsearch after several retries.")
-                raise e
+        except ConnectionError:
+            time.sleep(5)
+            logger.warning(f"Elasticsearch not ready (attempt {cnt+1}). Retrying in 5s...")
+            cnt += 1

@@ -10,7 +10,7 @@ from app.services.documents_service import (
     index_document,
     list_documents,
     search_documents,
-    get_all_documents_filtered
+    get_all_documents_filtered,
 )
 
 router = APIRouter(prefix="/docs")
@@ -38,12 +38,22 @@ async def create_document(doc: UploadFile = File(...)):
 
 
 @router.get("/filtered", response_model=list[DocumentInfo])
-def get_filtered_documents(limit: int = 5, query: Optional[str] = None, language: Optional[str] = None, type: Optional[str] = None, date: Optional[int] = None):
+def get_filtered_documents(
+    limit: int = 5,
+    query: Optional[str] = None,
+    language: Optional[str] = None,
+    type: Optional[str] = None,
+    date: Optional[int] = None,
+):
     try:
         if query:
-            return search_documents(limit, query, language=language, type=type, date=date)
+            return search_documents(
+                limit, query, language=language, type=type, date=date
+            )
 
-        return get_all_documents_filtered(limit, language=language, type=type, date=date)
+        return get_all_documents_filtered(
+            limit, language=language, type=type, date=date
+        )
     except Exception as e:
         _logger.exception("GET /docs/filtered failed: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
