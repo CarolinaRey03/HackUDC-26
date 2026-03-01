@@ -16,7 +16,7 @@ function Docs() {
   const { locale, setLocale } = useLanguage();
   const { docs } = useDocs();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
 
   const [filteredDocs, setFilteredDocs] = useState(docs);
 
@@ -43,15 +43,18 @@ function Docs() {
     setFilteredDocs(docs);
   }, [docs]);
 
-  const sortedDocs = [...filteredDocs].sort((a, b) => {
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
-    if (sortOrder === "asc") {
-      return nameA.localeCompare(nameB);
-    } else {
-      return nameB.localeCompare(nameA);
-    }
-  });
+  const sortedDocs =
+    sortOrder === "none"
+      ? filteredDocs
+      : [...filteredDocs].sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          if (sortOrder === "asc") {
+            return nameA.localeCompare(nameB);
+          } else {
+            return nameB.localeCompare(nameA);
+          }
+        });
 
   return (
     <>

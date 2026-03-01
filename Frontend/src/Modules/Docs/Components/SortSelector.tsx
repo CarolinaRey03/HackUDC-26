@@ -2,8 +2,8 @@ import Selector, { type SelectorOption } from "@/Modules/Common/Components/Selec
 import useI18n from "@/hooks/useI18n";
 
 interface SortSelectorProps {
-  sortOrder: "asc" | "desc";
-  setSortOrder: (order: "asc" | "desc") => void;
+  sortOrder: "asc" | "desc" | "none";
+  setSortOrder: (order: "asc" | "desc" | "none") => void;
 }
 
 const SortSelector = ({ sortOrder, setSortOrder }: SortSelectorProps) => {
@@ -20,9 +20,9 @@ const SortSelector = ({ sortOrder, setSortOrder }: SortSelectorProps) => {
     <Selector
       options={options}
       selectedOption={selectedOption}
-      updateSelectedOption={(option) => setSortOrder(option.value as "asc" | "desc")}
+      updateSelectedOption={(option) => setSortOrder((option.value as "asc" | "desc" | "") || "none")}
       placeholder={translate("filter.sort.placeholder")}
-      showNoneOption={false}
+      showNoneOption={true}
     />
   );
 };
