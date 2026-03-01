@@ -3,6 +3,8 @@
  * Adjust the BASE_URL to your backend's URL.
  */
 
+import type { SearchFilters } from "./Context/DocsContext";
+
 // --- Backend Configuration ---
 export const BASE_URL = "http://localhost:8000";
 // -----------------------------
@@ -60,10 +62,14 @@ export const uploadDoc = async (doc: File): Promise<void> => {
  * GET /docs/filtered
  * Filters docs with a query and limit.
  */
-export const getFilteredDocs = async (query: string, limit: number): Promise<DocInfo[]> => {
+export const getFilteredDocs = async (payload: SearchFilters): Promise<DocInfo[]> => {
   const url = new URL(`${BASE_URL}/docs/filtered`);
-  url.searchParams.append("query", query);
-  if (limit) url.searchParams.append("limit", limit.toString());
+
+  url.searchParams.append("query", payload.query ?? "");
+  if (payload.limit) url.searchParams.append("limit", payload.limit.toString());
+  if (payload.language) url.searchParams.append("language", payload.language);
+  if (payload.type) url.searchParams.append("type", payload.type);
+  if (payload.date) url.searchParams.append("date", payload.date.toString());
 
   const response = await fetch(url.toString(), {
     method: "GET",

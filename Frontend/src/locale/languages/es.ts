@@ -33,4 +33,12 @@ export const es: I18nTemplate = {
     lookleft: "Mira el resultado",
     welcome: "Haz una búqueda sobre tus documentos",
   },
+  filter: {
+    language: {
+      placeholder: "Idioma",
+      en: "Inglés",
+      es: "Castellano",
+    },
+    none: "Ninguno",
+  },
 };

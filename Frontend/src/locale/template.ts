@@ -31,4 +31,12 @@ export interface I18nTemplate {
       all_docs: string;
     };
   };
+  filter: {
+    none: string;
+    language: {
+      placeholder: string;
+      en: string;
+      es: string;
+    };
+  };
 }
