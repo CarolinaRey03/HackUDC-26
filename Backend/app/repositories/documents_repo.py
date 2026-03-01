@@ -37,7 +37,6 @@ def index_document_es(
     language: str,
     chunks: list[str],
     embeddings: list[list[float]],
-    chunks: list[str],
 ) -> None:
     client = _get_es_client()
     created_at = int(time.time())

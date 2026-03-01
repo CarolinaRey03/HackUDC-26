@@ -162,11 +162,12 @@ def _extract_text(content: bytes, content_type: str, filename: str) -> str:
 
     if ct in ["text/csv", "application/csv"] or name.endswith(".csv"):
         try:
-            texto_csv = content.decode("utf-8")
+            csv_text = content.decode("utf-8")
         except UnicodeDecodeError:
-            texto_csv = content.decode("latin1", errors="replace")
-            texto_limpio = texto_csv.replace(";", " ").replace(",", " ")
-        return texto_limpio
+            csv_text = content.decode("latin1", errors="replace")
+            clean_text = csv_text.replace(";", " ").replace(",", " ")
+
+            return clean_text
 
     if ct == "text/plain" and name.endswith(".txt"):
         return content.decode("utf-8", errors="replace")
