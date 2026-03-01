@@ -17,6 +17,10 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+.modal-container.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+}
+
 .modal-dialog {
   width: 500px;
   min-height: 300px;
@@ -28,6 +32,10 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 
   animation: slideUp 0.3s ease-out;
+}
+
+.modal-dialog.closing {
+  animation: slideDown 0.3s ease-in forwards;
 }
 
 .modal-header {
@@ -85,5 +93,25 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
   }
 }

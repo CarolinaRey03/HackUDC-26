@@ -14,7 +14,6 @@ interface DocViewerProps {
 
 function DocViewer({ file }: DocViewerProps) {
   const { translate } = useI18n();
-  console.log({ file });
   const { extension } = splitFilename(file.name);
 
   const decideViewer = (file: File, extension: string) => {
