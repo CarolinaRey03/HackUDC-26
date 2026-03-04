@@ -225,6 +225,8 @@ def _extract_text(content: bytes, content_type: str, filename: str) -> str:
 
             return clean_text
 
+        return csv_text
+
     if ct == "text/plain" and name.endswith(".txt"):
         return content.decode("utf-8", errors="replace")
 

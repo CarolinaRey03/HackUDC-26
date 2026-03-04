@@ -190,9 +190,9 @@ def _build_search_filters(
 ) -> list[dict]:
     filters: list[dict] = []
     if language:
-        filters.append({"term": {"language.keyword": language}})
+        filters.append({"term": {"language": language}})
     if file_type:
-        filters.append({"term": {"file_type.keyword": file_type}})
+        filters.append({"term": {"file_type": file_type}})
     if date is not None:
         filters.append({"range": {"created_at": {"gte": date}}})
     return filters
